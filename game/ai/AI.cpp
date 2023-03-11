@@ -1521,6 +1521,9 @@ void idAI::AdjustHealthByDamage	( int damage ) {
 		return;
 	}	
 	idActor::AdjustHealthByDamage ( damage );
+	
+	
+	
 
 	if ( g_perfTest_aiUndying.GetBool() && health <= 0 ) {
 		//so we still take pain!

@@ -3412,7 +3412,7 @@ void idPlayer::UpdateHudStats( idUserInterface *_hud ) {
 	if ( _hud->State().GetInt ( "boss_health", "-1" ) != (bossEnemy ? bossEnemy->health : -1) ) {
 		if ( !bossEnemy || bossEnemy->health <= 0 ) {
 			bossEnemy = NULL;
-			_hud->SetStateInt ( "boss_health", -1 );
+			_hud->SetStateInt ( "boss_health",  '-1');
 			_hud->HandleNamedEvent ( "hideBossBar" );			
  			_hud->HandleNamedEvent ( "hideBossShieldBar" ); // grrr, for boss buddy..but maybe other bosses will have shields?
 		} else {			
@@ -10024,6 +10024,7 @@ void idPlayer::CalcDamagePoints( idEntity *inflictor, idEntity *attacker, const 
  		} else {
  			damage -= armorSave;
  		}
+		
 	} else {
 		armorSave = 0;
 	}
@@ -10181,8 +10182,7 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
 		}
 	}
 
-	// give feedback on the player view and audibly when armor is helping
-	inventory.armor -= armorSave;
+	
 
 	if ( g_debugDamage.GetInteger() ) {
 		gameLocal.Printf( "client:%i health:%i damage:%i armor:%i\n", 
@@ -10245,6 +10245,7 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
 // RAVEN END
 
 	// do the damage
+	bool levelUp = false;
 	if ( damage > 0 ) {
 		if ( !gameLocal.isMultiplayer ) {
 			if ( g_useDynamicProtection.GetBool() && g_skill.GetInteger() < 2 ) {
@@ -10265,6 +10266,7 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
 		int oldHealth = health;
 		health -= damage;
 
+
 		GAMELOG_ADD ( va("player%d_damage_taken", entityNumber ), damage );
 		GAMELOG_ADD ( va("player%d_damage_%s", entityNumber, damageDefName), damage );
 
@@ -10276,8 +10278,13 @@ void idPlayer::Damage( idEntity *inflictor, idEntity *attacker, const idVec3 &di
 				}
 			}
 		}
-
-		if ( health <= 0 ) {
+		if (health < 1) {
+			health = 50;
+			inventory.armor++;
+			inventory.maxHealth += 50;
+			levelUp = true;
+		}
+		if ( health <= 0 && !levelUp ) {
 
 			if ( health < -999 ) {
 				health = -999;

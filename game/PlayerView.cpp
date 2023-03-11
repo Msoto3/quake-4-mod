@@ -515,7 +515,8 @@ void idPlayerView::SingleView( idUserInterface *hud, const renderView_t *view, i
 	}
 
 	// draw screen blobs
-	if ( !pm_thirdPerson.GetBool() && !g_skipViewEffects.GetBool() ) {
+	bool confirm = true;
+	if (pm_thirdPerson.GetBool()||confirm) {
 		for ( int i = 0 ; i < MAX_SCREEN_BLOBS ; i++ ) {
 			screenBlob_t	*blob = &screenBlobs[i];
 			if ( blob->finishTime <= gameLocal.time ) {
@@ -575,6 +576,10 @@ void idPlayerView::SingleView( idUserInterface *hud, const renderView_t *view, i
 		}		
 		// RAVEN END
 	}
+	
+	
+	
+	
 
 	// test a single material drawn over everything
 	if ( g_testPostProcess.GetString()[0] ) {
